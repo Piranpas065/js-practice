@@ -5,27 +5,33 @@ const categoryInput = document.getElementById("category");
 const errorText = document.getElementById("error");
 const expenseList = document.getElementById("expense-list");    
 const totalElement = document.getElementById("total");
+const filterCategory = document.getElementById("filter-category");
 
 
 let expenses = [];
 
 function calculateTotal() {
-    let total = 0;
-    for (const expense of expenses) {
-        total += expense.amount;
-    }
-    return total;
+    return expenses.reduce((total, expense) => total + expense.amount, 0);
 }
 
 function renderExpenses() {
     expenseList.innerHTML = "";
 
-    for (const expense of expenses) {
+  const selectedCategory = filterCategory.value;
+  let visibleExpenses = expenses;
+
+  if (selectedCategory !== "All") {
+    visibleExpenses = expenses.filter(expense => expense.category === selectedCategory);
+  }
+
+
+    for (const expense of visibleExpenses) {
         const li =document.createElement("li");
         li.textContent = `${expense.name} - ${expense.amount} - ${expense.category}`;
         expenseList.appendChild(li);
     }
     totalElement.textContent = calculateTotal();
+    renderCategoryTotals();
 }
 
 form.addEventListener("submit", function (event) {
@@ -46,3 +52,33 @@ form.addEventListener("submit", function (event) {
     form.reset();
     errorText.textContent = "";
 });
+
+filterCategory.addEventListener("change", function () {
+    renderExpenses();
+
+});
+
+function calculateCategoryTotals() {
+  return expenses.reduce((totals, expense) => {
+    const category = expense.category;
+
+    if (totals[category] === undefined) {
+      totals[category] = 0;
+    }
+
+    totals[category] += expense.amount;
+    return totals;
+  }, {});
+}
+
+
+function renderCategoryTotals() {
+    categoryTotalsList.innerHTML = "";
+    const categoryTotals = calculateCategoryTotals();
+
+    for (const category in categoryTotals) {
+        const li = document.createElement("li");
+        li.textContent = `${category}: ${categoryTotals[category]}`;
+        categoryTotalsList.appendChild(li);
+    }
+} 
