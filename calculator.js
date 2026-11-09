@@ -1,3 +1,27 @@
+function fakeFetchExpenses(shouldFail = false) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(function () {
+      if (shouldFail) {
+        reject("Server error");
+        return;
+      }
+    const success = Math.random() < 0.7;
+
+      
+
+      if (success) {
+        resolve([
+          { id: 1, name: "Rent", amount: 1000, category: "Bills" },
+          { id: 2, name: "Groceries", amount: 200, category: "Food" },
+          { id: 3, name: "Utilities", amount: 150, category: "Bills" }
+        ]);
+      } else {
+        reject("Network error");
+      }
+    }, 1500);
+  });
+}
+
 const form = document.getElementById("expense-form");
 const nameInput = document.getElementById("name");
 const amountInput = document.getElementById("amount");
@@ -7,6 +31,8 @@ const expenseList = document.getElementById("expense-list");
 const totalElement = document.getElementById("total");
 const filterCategory = document.getElementById("filter-category");
 const categoryTotalsList = document.getElementById("category-totals");
+const loadSampleButton = document.getElementById("load-sample");
+const loadingText = document.getElementById("loading");
 
 
 let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
@@ -37,6 +63,29 @@ function deleteExpense(id) {
   saveExpenses();
   renderExpenses();
 }
+
+loadSampleButton.addEventListener("click", function () {
+  loadingText.textContent = "Loading...";
+  errorText.textContent = "";
+  loadSampleButton.disabled = true;
+
+  fakeFetchExpenses()
+    .then(function (data) {
+      const newExpenses = data.filter(
+        item => !expenses.some(expense => expense.id === item.id)
+      );
+      expenses = [...expenses, ...newExpenses];
+      saveExpenses();
+      renderExpenses();
+    })
+    .catch(function (error) {
+        errorText.textContent = `Error: ${error}`;
+    })
+    .finally(function () {
+        loadingText.textContent = "";
+        loadSampleButton.disabled = false;
+    });
+});
 
 function renderExpenses() {
     expenseList.innerHTML = "";
