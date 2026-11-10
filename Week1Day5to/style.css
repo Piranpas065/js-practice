@@ -68,3 +68,18 @@ h1 {
 #weather-card h2 {
   margin-top: 0;
 }
+
+#forecast-list {
+  margin-top: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+#forecast-list li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+}

@@ -6,9 +6,11 @@ const weatherCard = document.getElementById('weather-card');
 const cityNameText = document.getElementById('city-name');
 const temperatureText = document.getElementById('temperature');
 const windText = document.getElementById('wind');
+const forecastList = document.getElementById('forecast-list');
 
 async function getCity(cityName) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1`;
+
+const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1`;
 
   const response = await fetch(url);
 
@@ -26,7 +28,7 @@ async function getCity(cityName) {
 }
 
 async function getWeather(latitude, longitude) {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m`;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&forecast_days=5&timezone=auto`;
 
   const response = await fetch(url);
 
@@ -36,7 +38,7 @@ async function getWeather(latitude, longitude) {
 
   const data = await response.json();
 
-  return data.current;
+  return { current: data.current, daily: data.daily };
 }
 
 searchForm.addEventListener("submit", async function (event) {
@@ -51,20 +53,38 @@ searchForm.addEventListener("submit", async function (event) {
 
   statusText.textContent = "Loading...";
   weatherCard.hidden = true;
+  forecastList.hidden = true;
   searchButton.disabled = true;
 
   try {
     const city = await getCity(cityName);
     const weather = await getWeather(city.latitude, city.longitude);
     cityNameText.textContent = `${city.name}, ${city.country}`;
-    temperatureText.textContent = `${weather.temperature_2m} °C`;
-    windText.textContent = `${weather.wind_speed_10m} m/s`;
+    temperatureText.textContent = weather.current.temperature_2m;
+    windText.textContent = weather.current.wind_speed_10m;
+    renderForecast(weather.daily);
 
     statusText.textContent = "";
     weatherCard.hidden = false;
+    forecastList.hidden = false;
   } catch (error) {
     statusText.textContent = error.message;
   } finally {
     searchButton.disabled = false;
   }
 });
+
+function renderForecast(daily) {
+  forecastList.innerHTML = "";
+
+  daily.time.forEach(function (date, index) {
+    const li = document.createElement("li");
+
+    const max = daily.temperature_2m_max[index];
+    const min = daily.temperature_2m_min[index];
+
+    li.textContent = `${date} - ${min} to ${max} °C`;
+
+    forecastList.appendChild(li);
+  });
+}
