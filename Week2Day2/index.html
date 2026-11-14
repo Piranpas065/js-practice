@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Expense Calculator</h1>
+
+  <form id="expense-form">
+    <input id="name" placeholder="Name">
+    <input id="amount" type="number" step="0.01" placeholder="Amount">
+    <select id="category">
+      <option value="">Select Category</option>
+      <option>Food</option>
+      <option>Travel</option>
+      <option>Bills</option>
+    </select>
+    <button type="submit">Add</button>
+  </form>
+
+  <p id="error"></p>
+   <button id="load-sample" type="button">Load Sample Data</button>
+   <p id="loading"></p>
+ <label for="filter-category">Filter:</label>
+  <select id="filter-category">
+    <option value="All">All</option>
+    <option >Food</option>
+    <option>Travel</option>
+    <option>Bills</option>
+  </select>
+  <ul id="expense-list"></ul>
+  <p>Total: <span id="total">0</span></p>
+  <ul id="category-totals"></ul>
+
+   <script type="module" src="calculator.js"></script>
+</body>
+</html>
